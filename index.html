@@ -28,7 +28,7 @@
     }
     header h1{ margin:0; color:var(--accent); font-size:20px; }
     header .meta{ color:var(--muted); font-size:13px; margin-top:6px;}
-    .section{ margin-top:16px; padding-top:12px; }  /* 🔹 removed border line */
+    .section{ margin-top:16px; padding-top:12px; }
     .row{ display:flex; gap:12px; margin-bottom:8px; flex-wrap:wrap; }
     .col{ flex:1; min-width:180px; }
     label{ display:block; font-size:12px; color:#333; margin-bottom:4px; }
@@ -48,7 +48,6 @@
     .rating{ display:flex; gap:6px; align-items:center; }
     .rating input{ width:40px; }
 
-    /* Force desktop layout when exporting or printing */
     .pdf-mode .sheet {
       width: calc(var(--paper-width) - 24px) !important;
       padding: 18mm !important;
@@ -62,7 +61,6 @@
       button, .controls{ display:none; }
     }
     
-/* Responsive adjustments for mobile */
     @media screen and (max-width: 768px) {
       .sheet {
         width: 100% !important;
@@ -80,14 +78,8 @@
       .section { page-break-inside: avoid; }
     }
 
-    /* Prevent splitting */
-    .antennaCard, .bdeCard, .reportCard {
-      page-break-inside: avoid;
-      break-inside: avoid;
-      margin-bottom: 12px;
-    }
+    .reportCard { page-break-inside: avoid; margin-bottom: 12px; }
 
-    /* PDF-only: report text boxes */
     .pdf-export .reportCard textarea {
       display: block;
       width: 100%;
@@ -115,58 +107,43 @@
       white-space: pre-wrap;
     }
     .report-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-bottom: 2px solid #e0e4ea;
-  padding-bottom: 12px;
-  margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 2px solid #e0e4ea;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+    .report-header .logo { height: 64px; width: auto; }
+    .header-text h1 { margin: 0; color: var(--accent); font-size: 24px; }
+    .header-text .meta { color: var(--muted); font-size: 15px; margin-top: 4px; }
+    .report-header .logo-link { display: inline-block; }
+    .pdf-mode .report-header { border-bottom: 1px solid #ccc; }
+    button.add-button {
+  background: #4CAF50; /* A nice shade of green */
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.12); /* Optional: Adjust shadow color */
 }
 
-.report-header .logo {
-  height: 64px;
-  width: auto;
+button.remove-button {
+  background: #f44336; /* A nice shade of red */
+  color: white; /* Make the text white for better contrast */
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.12); /* Optional: Adjust shadow color */
+  border: none; /* Remove the border inherited from .secondary */
 }
-
-.header-text h1 {
-  margin: 0;
-  color: var(--accent);
-  font-size: 24px;
-}
-
-
-.header-text .meta {
-  color: var(--muted);
-  font-size: 15px;
-  margin-top: 4px;
-}
-
-.report-header .logo-link {
-  display: inline-block;
-}
-
-
-
-/* PDF adjustments */
-.pdf-mode .report-header {
-  border-bottom: 1px solid #ccc;
-}
-
   </style>
 </head>
 <body>
   <div class="sheet" id="reportRoot">
     <header class="report-header">
-  <a href="https://mntsat.com" target="_blank" class="logo-link">
-    <img src="https://raw.githubusercontent.com/pgarciafer/mtn_fsr/main/mtnsatlogo.png" 
-         alt="MNT Sat Logo" class="logo">
-  </a>
-  <div class="header-text">
-    <h1>Field Service Report – TVRO</h1>
-    <div class="meta">Field Services Engineering Document</div>
-  </div>
-</header>
-
+      <a href="https://mtnsat.com" target="_blank" class="logo-link">
+        <img src="https://raw.githubusercontent.com/pgarciafer/mtn_fsr/main/mtnsatlogo.png" 
+             alt="MNT Sat Logo" class="logo">
+      </a>
+      <div class="header-text">
+        <h1>Field Service Report – TVRO</h1>
+        <div class="meta">Field Services Engineering Document</div>
+      </div>
+    </header>
 
     <!-- Submitted By -->
     <div class="section table-like">
@@ -193,96 +170,34 @@
       </div>
     </div>
 
-    <!-- Antenna Details (dynamic) -->
+    <!-- Assets (moved inside .sheet) -->
     <div class="section">
-      <h3>Antenna Details</h3>
-      <div id="antennaContainer">
-        <div class="antennaCard table-like" style="margin-bottom:10px;">
-  <h4 class="antHeading" style="margin:0 0 8px 0; color:#0b68b0;">Antenna</h4>
-
-          <div class="row">
-            <div class="col"><label>Model Number</label><input type="text" class="antModel" /></div>
-            <div class="col"><label>Serial Number</label><input type="text" class="antSerial" /></div>
-            <div class="col"><label>Description</label><input type="text" class="antDesc" /></div>
-            
-            <div class="col"><label>Location</label><input type="text" class="antLocation" /></div>
-            <div class="col"><label>Condition</label><input type="text" class="antCondition" /></div>
-          </div>
-          <div class="row">
-            <div class="col"><label>IFL Type</label><input type="text" class="antIFL" /></div>
-            <div class="col"><label>Feed Type</label><input type="text" class="antFeed" /></div>
-            <div class="col"><label>Filter & LNB Type</label><input type="text" class="antFilter" /></div>
-          </div>
-          <div class="row">
-            <div class="col"><label>IFL Termination details</label><input type="text" class="antIFLTerm" /></div>
-          </div>
-        </div>
-      </div>
+      <h3>Assets</h3>
+      <div id="assetsContainer"></div>
       <div class="controls">
-        <button type="button" id="addAntenna">Add Antenna</button>
-        <button type="button" id="removeAntenna" class="secondary">Remove Antenna</button>
-      </div>
-    </div>
-
-    <!-- Below Deck Equipment (dynamic) -->
-    <div class="section">
-      <h3>Below Deck Equipment</h3>
-      <div id="bdeContainer">
-        <div class="bdeCard table-like" style="margin-bottom:10px;">
-  <h4 class="bdeHeading" style="margin:0 0 8px 0; color:#0b68b0;">Below Deck Equipment</h4>
-
-
-          <div class="row">
-            <div class="col"><label>Model</label><input type="text" class="bdeModel" /></div>
-            <div class="col"><label>Serial Number</label><input type="text" class="bdeSN" /></div>
-            <div class="col"><label>Description</label><input type="text" class="bdeDesc" /></div>
-            <div class="col"><label>IP Address</label><input type="text" class="bdeIP" /></div>
-            <div class="col"><label>Rack Location</label><input type="text" class="bdeRack" /></div>
-            <div class="col"><label>IFL Termination details</label><input type="text" class="bdeTerm"></div>
-            
-            <div class="col"><label>Matrix Type – In use/Bypassed?</label><input type="text" class="bdeMatrix" /></div>
-          </div>
-
-        </div>
-      </div>
-      <div class="controls">
-        <button type="button" id="addBde">Add Equipment</button>
-        <button type="button" id="removeBde" class="secondary">Remove Equipment</button>
-      </div>
-    </div>
-
-    <!-- Receivers -->
-    <div class="section">
-      <h3>Receiver</h3>
-      <div class="row table-like">
-        <div class="col"><label>Model</label><input type="text" id="recModel" /></div>
-        <div class="col"><label>Description</label><input type="text" id="recDesc" /></div>
-        <div class="col"><label>Serial Numbers</label><input type="text" id="recSN" /></div>
-        <div class="col"><label>Input connection</label><input type="text" id="recInput" /></div>
-        <div class="col"><label>Signal Level / Margin</label><input type="text" id="recSignal" /></div>
-        <div class="col"><label>Satellite</label><input type="text" id="recSatellite" /></div>
-      </div>
+    <button type="button" id="addAsset" class="add-button">Add Asset</button>
+    <button type="button" id="removeAsset" class="remove-button secondary">Remove Last Asset</button>
+</div>
     </div>
 
     <!-- Report Entries -->
     <div class="section">
       <h3>Report & Additional Details</h3>
       <div id="reportEntries">
-  <div class="table-like" style="margin-bottom:8px;">
-    <div class="row" style="flex-direction:column;">
-      <div class="col" style="width:100%;"><label>Date</label><input type="date" class="entryDate" /></div>
-      <div class="col" style="width:100%;"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
-    </div>
-  </div>
-</div>
-
+        <div class="table-like" style="margin-bottom:8px;">
+          <div class="row" style="flex-direction:column;">
+            <div class="col" style="width:100%;"><label>Date</label><input type="date" class="entryDate" /></div>
+            <div class="col" style="width:100%;"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
+          </div>
+        </div>
+      </div>
       <div class="controls">
         <button type="button" id="addEntry">Add Report Entry</button>
         <button type="button" id="removeEntry" class="secondary">Remove Last Entry</button>
       </div>
     </div>
 
-    <!-- Embedded Files (dynamic) -->
+    <!-- Embedded Files -->
     <div class="section">
       <h3>Embedded Files / Configs</h3>
       <div id="embeddedContainer">
@@ -297,35 +212,7 @@
       </div>
     </div>
 
-    <!-- Pictures -->
-    <div class="section">
-      <h3>Pictures</h3>
-      <div id="picturesContainer">
-        <div class="pictureCard row table-like" style="margin-bottom:10px; align-items:center;">
-          <div class="col">
-            <label>Comment</label>
-            <input type="text" class="picComment" />
-          </div>
-          <div class="col">
-            <label>Picture</label>
-            <div class="picUpload" 
-                 style="border:2px dashed #cfd6dd; padding:10px; text-align:center; cursor:pointer; border-radius:4px; background:#fff;">
-              <p style="margin:0; font-size:12px; color:#666;">Click or drag a picture here</p>
-              <input type="file" class="picInput" accept="image/*" style="display:none;" />
-              <div class="picPreview" style="margin-top:8px;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="controls">
-        <button type="button" id="addPicture">Add Picture</button>
-        <button type="button" id="removePicture" class="secondary">Remove Picture</button>
-      </div>
-    </div>
-
-
-
-    <!-- Final Comments / Signatures -->
+    <!-- Final Comments -->
     <div class="section">
       <h3>Final Comments / Recommendations</h3>
       <textarea id="finalComments"></textarea>
@@ -357,20 +244,22 @@
       </div>
     </div>
 
-    <!-- Controls -->
+        <!-- Controls -->
     <div class="controls" style="margin-top:18px;">
       <button id="generatePdf">Generate PDF</button>
       <button id="printBtn" class="secondary">Print (Save PDF)</button>
       <button id="downloadJson" class="secondary">Download JSON</button>
       <button id="clearForm" class="secondary">Clear form</button>
     </div>
-  </div>
+
+    
+  </div> <!-- now close .sheet here -->
+
+
 
   <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-
   <script>
-    // Utility for cloning
     function cloneCard(containerId, cardClass){
       const container = document.getElementById(containerId);
       const firstCard = container.querySelector(`.${cardClass}`);
@@ -383,43 +272,6 @@
       if(container.children.length > 1) container.removeChild(container.lastElementChild);
     }
 
-// Renumber Antennas
-function renumberAntennas() {
-  document.querySelectorAll('#antennaContainer .antennaCard').forEach((card, i) => {
-    const heading = card.querySelector('.antHeading');
-    if (heading) heading.textContent = `Antenna ${i + 1}`;
-  });
-}
-
-// Renumber Below Deck
-function renumberBde() {
-  document.querySelectorAll('#bdeContainer .bdeCard').forEach((card, i) => {
-    const heading = card.querySelector('.bdeHeading');
-    if (heading) heading.textContent = `Below Deck Equipment ${i + 1}`;
-  });
-}
-
-
-// Antennas
-document.getElementById('addAntenna').onclick = ()=>{
-  cloneCard('antennaContainer','antennaCard');
-  renumberAntennas();
-};
-document.getElementById('removeAntenna').onclick = ()=>{
-  removeCard('antennaContainer');
-  renumberAntennas();
-};
-
-// Below Deck Equipment
-document.getElementById('addBde').onclick = ()=>{
-  cloneCard('bdeContainer','bdeCard');
-  renumberBde();
-};
-document.getElementById('removeBde').onclick = ()=>{
-  removeCard('bdeContainer');
-  renumberBde();
-};
-
     // Embedded Files
     document.getElementById('addEmbedded').onclick = ()=>cloneCard('embeddedContainer','embeddedCard');
     document.getElementById('removeEmbedded').onclick = ()=>removeCard('embeddedContainer');
@@ -430,12 +282,11 @@ document.getElementById('removeBde').onclick = ()=>{
       const block = document.createElement('div');
       block.className = 'table-like';
       block.style.marginBottom = '8px';
-        block.innerHTML = `
-    <div class="row" style="flex-direction:column;">
-      <div class="col" style="width:100%;"><label>Date</label><input type="date" class="entryDate" /></div>
-      <div class="col" style="width:100%;"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
-    </div>`;
-
+      block.innerHTML = `
+        <div class="row" style="flex-direction:column;">
+          <div class="col" style="width:100%;"><label>Date</label><input type="date" class="entryDate" /></div>
+          <div class="col" style="width:100%;"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
+        </div>`;
       container.appendChild(block);
     };
     document.getElementById('removeEntry').onclick = ()=>{
@@ -447,74 +298,69 @@ document.getElementById('removeBde').onclick = ()=>{
     document.getElementById('clearForm').onclick = ()=>{
       if(!confirm('Clear all fields?')) return;
       document.querySelectorAll('#reportRoot input, #reportRoot textarea').forEach(el => el.value = '');
-      document.getElementById('antennaContainer').innerHTML = document.querySelector('.antennaCard').outerHTML;
-      document.getElementById('bdeContainer').innerHTML = document.querySelector('.bdeCard').outerHTML;
       document.getElementById('embeddedContainer').innerHTML = document.querySelector('.embeddedCard').outerHTML;
       document.getElementById('reportEntries').innerHTML = `
-  <div class="table-like" style="margin-bottom:8px;">
-    <div class="row" style="flex-direction:column;">
-      <div class="col" style="width:100%;"><label>Date</label><input type="date" class="entryDate" /></div>
-      <div class="col" style="width:100%;"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
-    </div>
-  </div>`;
-
+        <div class="table-like" style="margin-bottom:8px;">
+          <div class="row" style="flex-direction:column;">
+            <div class="col" style="width:100%;"><label>Date</label><input type="date" class="entryDate" /></div>
+            <div class="col" style="width:100%;"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
+          </div>
+        </div>`;
     };
 
     // Gather form data
-    function gatherFormData(){
-      const get = id => document.getElementById(id)?.value || '';
-      const antennas = Array.from(document.querySelectorAll('#antennaContainer .antennaCard')).map(card => ({
-        model: card.querySelector('.antModel').value,
-        desc: card.querySelector('.antDesc').value,
-        serial: card.querySelector('.antSerial').value,
-        location: card.querySelector('.antLocation').value,
-        condition: card.querySelector('.antCondition').value,
-        ifl: card.querySelector('.antIFL').value,
-        feed: card.querySelector('.antFeed').value,
-        filter: card.querySelector('.antFilter').value,
-        iflTerm: card.querySelector('.antIFLTerm').value
+        function gatherFormData() {
+      function get(id) {
+        return document.getElementById(id)?.value || "";
+      }
+
+      // Report entries
+      const entries = Array.from(document.querySelectorAll('#reportEntries .reportEntry')).map(entry => ({
+        date: entry.querySelector('.reportDate').value,
+        location: entry.querySelector('.reportLocation').value,
+        description: entry.querySelector('.reportDescription').value
       }));
-      const bde = Array.from(document.querySelectorAll('#bdeContainer .bdeCard')).map(card => ({
-        model: card.querySelector('.bdeModel').value,
-        desc: card.querySelector('.bdeDesc').value,
-        sn: card.querySelector('.bdeSN').value,
-        rack: card.querySelector('.bdeRack').value,
-        term: card.querySelector('.bdeTerm').value,
-        ip: card.querySelector('.bdeIP').value,
-        matrix: card.querySelector('.bdeMatrix').value
+
+      // Embedded images
+      const embedded = Array.from(document.querySelectorAll('#imagePreview img')).map(img => img.src);
+
+      // Assets
+      const assets = Array.from(document.querySelectorAll('#assetsContainer .assetCard')).map(card => ({
+        type: card.querySelector('input[readonly]').value,
+        detail: card.querySelector('.assetDetail').value
       }));
-      const embedded = Array.from(document.querySelectorAll('#embeddedContainer .embeddedCard')).map(card => ({
-        desc: card.querySelector('.embDesc').value,
-        files: card.querySelector('.embFiles').value
-      }));
-      const entries = Array.from(document.querySelectorAll('#reportEntries .table-like')).map(block => ({
-        date: block.querySelector('.entryDate').value,
-        detail: block.querySelector('.entryDetail').value
-      }));
+
+      // Final return
       return {
         submittedBy: get('submittedBy'),
         position: get('position'),
         formDate: get('formDate'),
         dispatch: {
-          woNumber:get('woNumber'),
-          taskDescription:get('taskDescription'),
-          customer:get('customer'),
-          techNames:get('techNames'),
-          reportDate:get('reportDate'),
-          siteName:get('siteName'),
-          arrival:get('arrival'),
-          departure:get('departure')
+          woNumber: get('woNumber'),
+          taskDescription: get('taskDescription'),
+          customer: get('customer'),
+          techNames: get('techNames'),
+          siteName: get('siteName'),
+          arrival: get('arrival'),
+          departure: get('departure')
         },
-        antennas, belowDeck:bde, receivers:{
-          model:get('recModel'), desc:get('recDesc'), serials:get('recSN'),
-          input:get('recInput'), signal:get('recSignal'), satellite:get('recSatellite')
+        assets,  // ✅ added here
+        reportEntries: entries,
+        embedded,
+        finalComments: get('finalComments'),
+        signatures: {
+          techName: get('techName'),
+          techDate: get('techDate'),
+          custName: get('custName'),
+          custDate: get('custDate')
         },
-        reportEntries:entries, embedded,
-        finalComments:get('finalComments'),
-        signatures:{ techName:get('techName'), techDate:get('techDate'), custName:get('custName'), custDate:get('custDate') },
-        feedback:{ rating:get('rating'), comments:get('custComments') }
+        feedback: {
+          rating: get('rating'),
+          comments: get('custComments')
+        }
       };
     }
+
 
     // JSON export
     document.getElementById('downloadJson').onclick = ()=>{
@@ -525,16 +371,13 @@ document.getElementById('removeBde').onclick = ()=>{
       URL.revokeObjectURL(url);
     };
 
-// PDF
+    // PDF
     document.getElementById('generatePdf').onclick = () => {
       const now = new Date();
       const fname = `FieldServiceReport_${now.toISOString().split('T')[0]}.pdf`;
       const element = document.getElementById('reportRoot');
-
-      // Force desktop layout
       document.body.classList.add("pdf-mode");
 
-      // Convert report entry textareas into static boxes
       document.querySelectorAll('#reportEntries .table-like textarea').forEach(textarea => {
         const div = document.createElement('div');
         div.className = 'reportTextBox';
@@ -543,146 +386,86 @@ document.getElementById('removeBde').onclick = ()=>{
         textarea.style.display = 'none';
         textarea.parentNode.insertBefore(div, textarea);
       });
-
       element.classList.add("pdf-export");
 
       html2pdf().set({
         margin:[8,8,8,8],
         filename:fname,
         image:{ type:'jpeg', quality:0.98 },
-        html2canvas:{ scale:2, useCORS:true },
+        html2canvas:{ scale:2, useCORS:true, logging:false },
         jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
-      }).from(element).save().then(()=>{
+      }).from(element).toPdf().get('pdf').then(pdf => {
+        pdf.link(20, 20, 40, 15, { url: "https://mtnsat.com" });
+      }).save().then(()=>{
         document.querySelectorAll('#reportEntries .reportTextBox').forEach(div => div.remove());
         document.querySelectorAll('#reportEntries textarea').forEach(textarea => textarea.style.display = '');
         element.classList.remove("pdf-export");
-
-        // Restore layout
         document.body.classList.remove("pdf-mode");
       });
     };
 
+        // Assets
+    // Assets
+document.getElementById('addAsset').onclick = () => {
+    const validAssets = ["VSAT", "TVRO", "Starlink", "5G", "Other"];
+    const container = document.getElementById('assetsContainer');
+    const controls = document.querySelector('.controls');
 
+    // Create a temporary dropdown element
+    const tempSelectDiv = document.createElement('div');
+    tempSelectDiv.className = 'temp-select-container';
+    tempSelectDiv.innerHTML = `
+        <label>Select Asset Type:</label>
+        <select id="assetSelect" style="padding: 8px; border: 1px solid #d7dbe1; border-radius: 4px; font-size: 13px;">
+            <option value="">-- Please Choose --</option>
+            ${validAssets.map(asset => `<option value="${asset}">${asset}</option>`).join('')}
+        </select>
+        <button id="confirmAsset" type="button" class="add-button" style="margin-left: 8px;">OK</button>
+        <button id="cancelAsset" type="button" class="secondary">Cancel</button>
+    `;
 
+    // Insert the dropdown before the asset controls
+    controls.parentNode.insertBefore(tempSelectDiv, controls);
 
+    const assetSelect = document.getElementById('assetSelect');
+    const confirmButton = document.getElementById('confirmAsset');
+    const cancelButton = document.getElementById('cancelAsset');
 
-    document.getElementById('printBtn').onclick = ()=>window.print();
+    confirmButton.onclick = () => {
+        const assetType = assetSelect.value;
+        if (!assetType) {
+            alert("Please select an asset type.");
+            return;
+        }
+        
+        // Remove the temporary dropdown
+        tempSelectDiv.remove();
 
-  
-
-
-
-    // Pictures
-    document.getElementById('addPicture').onclick = () => cloneCard('picturesContainer','pictureCard');
-    document.getElementById('removePicture').onclick = () => removeCard('picturesContainer');
-
-    // Setup drag/drop + preview for all picture cards
-    function setupPictureCard(card) {
-      const uploadBox = card.querySelector('.picUpload');
-      const fileInput = card.querySelector('.picInput');
-      const preview = card.querySelector('.picPreview');
-
-      // Reset preview
-      preview.innerHTML = '';
-
-      // Click triggers file select
-      uploadBox.onclick = () => fileInput.click();
-
-      // File select
-      fileInput.onchange = () => handlePictureFiles(fileInput.files, preview);
-
-      // Drag & Drop
-      uploadBox.ondragover = e => {
-        e.preventDefault();
-        uploadBox.style.background = '#eef6ff';
-      };
-      uploadBox.ondragleave = e => {
-        e.preventDefault();
-        uploadBox.style.background = '#fff';
-      };
-      uploadBox.ondrop = e => {
-        e.preventDefault();
-        uploadBox.style.background = '#fff';
-        handlePictureFiles(e.dataTransfer.files, preview);
-      };
-    }
-
-    function handlePictureFiles(files, preview) {
-      preview.innerHTML = ''; // only one picture per row
-      for (let file of files) {
-        if (!file.type.startsWith('image/')) continue;
-        const reader = new FileReader();
-        reader.onload = evt => {
-          const img = document.createElement('img');
-          img.src = evt.target.result;
-          img.style.maxWidth = '120px';
-          img.style.maxHeight = '120px';
-          img.style.objectFit = 'cover';
-          img.style.border = '1px solid #ccc';
-          img.style.borderRadius = '4px';
-          preview.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-        break; // one picture per row
-      }
-    }
-
-    // Initialize the first picture card
-    setupPictureCard(document.querySelector('.pictureCard'));
-
-    // Extend cloneCard for picture cards
-    const oldCloneCard = cloneCard;
-    cloneCard = function(containerId, cardClass){
-      oldCloneCard(containerId, cardClass);
-      if(cardClass === 'pictureCard'){
-        const newCard = document.querySelector(`#${containerId} .${cardClass}:last-child`);
-        newCard.querySelectorAll('input').forEach(el => el.value = '');
-        setupPictureCard(newCard);
-      }
+        // Create the new asset card
+        const block = document.createElement('div');
+        block.className = 'assetCard table-like';
+        block.style.marginBottom = '8px';
+        block.innerHTML = `
+            <div class="row">
+                <div class="col"><label>Asset Type</label><input type="text" value="${assetType}" readonly /></div>
+                <div class="col"><label>Details</label><input type="text" class="assetDetail" /></div>
+            </div>`;
+        container.appendChild(block);
     };
 
-function updateAntennaHeadings() {
-  document.querySelectorAll('#antennaContainer .antennaCard').forEach((card, i) => {
-    const model = card.querySelector('.antModel')?.value || '';
-    const sn = card.querySelector('.antSerial')?.value || '';
-    const loc = card.querySelector('.antLocation')?.value || '';
-    const heading = card.querySelector('.antHeading');
-    if (heading) {
-      if (model || sn || loc) {
-        heading.textContent = `Antenna: ${model}${sn ? "_SN#" + sn : ""}${loc ? " – " + loc : ""}`;
-      } else {
-        heading.textContent = `Antenna ${i + 1}`;
-      }
-    }
-  });
-}
+    cancelButton.onclick = () => {
+        tempSelectDiv.remove();
+    };
+};
 
-function updateBdeHeadings() {
-  document.querySelectorAll('#bdeContainer .bdeCard').forEach((card, i) => {
-    const model = card.querySelector('.bdeModel')?.value || '';
-    const sn = card.querySelector('.bdeSN')?.value || '';
-    const rack = card.querySelector('.bdeRack')?.value || '';
-    const heading = card.querySelector('.bdeHeading');
-    if (heading) {
-      if (model || sn || rack) {
-        heading.textContent = `Below Deck Equipment: ${model}${sn ? "_SN#" + sn : ""}${rack ? " – " + rack : ""}`;
-      } else {
-        heading.textContent = `Below Deck Equipment ${i + 1}`;
-      }
-    }
-  });
-}
+    document.getElementById('removeAsset').onclick = () => {
+      const container = document.getElementById('assetsContainer');
+      if (container.children.length > 0) container.removeChild(container.lastElementChild);
+    };
 
 
-// Print
-    document.getElementById('printBtn').onclick = () => {
-      document.body.classList.add("pdf-mode");
-      window.print();
-      document.body.classList.remove("pdf-mode");
-    }
-
-
-
+    // Print
+    document.getElementById('printBtn').onclick = ()=>window.print();
   </script>
 </body>
 </html>
