@@ -114,14 +114,59 @@
       border-radius: 4px;
       white-space: pre-wrap;
     }
+    .report-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 2px solid #e0e4ea;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.report-header .logo {
+  height: 64px;
+  width: auto;
+}
+
+.header-text h1 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 24px;
+}
+
+
+.header-text .meta {
+  color: var(--muted);
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.report-header .logo-link {
+  display: inline-block;
+}
+
+
+
+/* PDF adjustments */
+.pdf-mode .report-header {
+  border-bottom: 1px solid #ccc;
+}
+
   </style>
 </head>
 <body>
   <div class="sheet" id="reportRoot">
-    <header>
-      <h1>MTN Quality Management System — Field Service Report – TVRO</h1>
-      <div class="meta">Field Engineering Document</div>
-    </header>
+    <header class="report-header">
+  <a href="https://mntsat.com" target="_blank" class="logo-link">
+    <img src="https://raw.githubusercontent.com/pgarciafer/mtn_fsr/main/mtnsatlogo.png" 
+         alt="MNT Sat Logo" class="logo">
+  </a>
+  <div class="header-text">
+    <h1>Field Service Report – TVRO</h1>
+    <div class="meta">Field Services Engineering Document</div>
+  </div>
+</header>
+
 
     <!-- Submitted By -->
     <div class="section table-like">
