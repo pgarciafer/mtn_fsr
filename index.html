@@ -114,60 +114,14 @@
       border-radius: 4px;
       white-space: pre-wrap;
     }
-    .report-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-bottom: 2px solid #e0e4ea;
-  padding-bottom: 12px;
-  margin-bottom: 18px;
-}
-
-.report-header .logo {
-  height: 64px;
-  width: auto;
-}
-
-.header-text h1 {
-  margin: 0;
-  color: var(--accent);
-  font-size: 24px;
-}
-
-
-.header-text .meta {
-  color: var(--muted);
-  font-size: 15px;
-  margin-top: 4px;
-}
-
-.report-header .logo-link {
-  display: inline-block;
-}
-
-
-
-/* PDF adjustments */
-.pdf-mode .report-header {
-  border-bottom: 1px solid #ccc;
-}
-
   </style>
 </head>
 <body>
   <div class="sheet" id="reportRoot">
-    <header class="report-header">
-  <a href="https://mtnsat.com" target="_blank" class="logo-link">
-
-    <img src="https://raw.githubusercontent.com/pgarciafer/mtn_fsr/main/mtnsatlogo.png" 
-         alt="MNT Sat Logo" class="logo">
-  </a>
-  <div class="header-text">
-    <h1>Field Service Report – TVRO</h1>
-    <div class="meta">Field Services Engineering Document</div>
-  </div>
-</header>
-
+    <header>
+      <h1>MTN Quality Management System — Field Service Report – TVRO</h1>
+      <div class="meta">Field Engineering Document</div>
+    </header>
 
     <!-- Submitted By -->
     <div class="section table-like">
@@ -548,22 +502,19 @@ document.getElementById('removeBde').onclick = ()=>{
       element.classList.add("pdf-export");
 
       html2pdf().set({
-  margin:[8,8,8,8],
-  filename:fname,
-  image:{ type:'jpeg', quality:0.98 },
-  html2canvas:{ scale:2, useCORS:true, logging:false },
-  jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
-}).from(element).toPdf().get('pdf').then(pdf => {
-  // Overlay a clickable link where the logo is
-  // Adjust coords (x, y, w, h) if logo moves
-  pdf.link(20, 20, 40, 15, { url: "https://mntsat.com" });
-}).save().then(()=>{
-  document.querySelectorAll('#reportEntries .reportTextBox').forEach(div => div.remove());
-  document.querySelectorAll('#reportEntries textarea').forEach(textarea => textarea.style.display = '');
-  element.classList.remove("pdf-export");
-  document.body.classList.remove("pdf-mode");
-});
+        margin:[8,8,8,8],
+        filename:fname,
+        image:{ type:'jpeg', quality:0.98 },
+        html2canvas:{ scale:2, useCORS:true },
+        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
+      }).from(element).save().then(()=>{
+        document.querySelectorAll('#reportEntries .reportTextBox').forEach(div => div.remove());
+        document.querySelectorAll('#reportEntries textarea').forEach(textarea => textarea.style.display = '');
+        element.classList.remove("pdf-export");
 
+        // Restore layout
+        document.body.classList.remove("pdf-mode");
+      });
     };
 
 
@@ -683,7 +634,6 @@ function updateBdeHeadings() {
       document.body.classList.add("pdf-mode");
       window.print();
       document.body.classList.remove("pdf-mode");
-    }
 
 
 
