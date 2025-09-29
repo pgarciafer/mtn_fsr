@@ -1,334 +1,737 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Field Service Report</title>
-
-  <style>
-    :root{
-      --accent:#0b68b0;
-      --muted:#666;
-      --paper-width:210mm;
-    }
-    body{
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      margin:12px;
-      background: #f4f6f8;
-      color:#222;
-    }
-    .sheet {
-      background: white;
-      width: calc(var(--paper-width) - 24px);
-      margin: 10px auto;
-      padding: 18mm;
-      border-radius: 6px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-      box-sizing: border-box;
-    }
-    header h1{ margin:0; color:var(--accent); font-size:20px; }
-    header .meta{ color:var(--muted); font-size:13px; margin-top:6px;}
-    .section{ margin-top:16px; padding-top:12px; }
-    .row{ display:flex; gap:12px; margin-bottom:8px; flex-wrap:wrap; }
-    .col{ flex:1; min-width:180px; }
-    label{ display:block; font-size:12px; color:#333; margin-bottom:4px; }
-    input[type="text"], input[type="date"], input[type="number"], textarea{
-      width:100%; box-sizing:border-box; padding:8px;
-      border:1px solid #d7dbe1; border-radius:4px; font-size:13px; background:#fff;
-    }
-    textarea{ min-height:80px; resize:vertical; }
-    .table-like{ border:1px solid #e0e4ea; padding:10px; border-radius:6px; background:#fbfdff; }
-    .controls{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
-    button{
-      background:var(--accent); color:white; border:none; padding:10px 14px; border-radius:6px;
-      cursor:pointer; font-weight:600; box-shadow: 0 4px 8px rgba(11,104,176,0.12);
-    }
-    button.secondary{ background:#f3f5f8; color:#222; box-shadow:none; border:1px solid #e1e5ea; }
-    .signature-box{ min-height:64px; border:1px dashed #cfd6dd; padding:8px; border-radius:4px; background:#fff; }
-    .rating{ display:flex; gap:6px; align-items:center; }
-    .rating input{ width:40px; }
-
-    .pdf-mode .sheet {
-      width: calc(var(--paper-width) - 24px) !important;
-      padding: 18mm !important;
-      margin: 10px auto !important;
-      border-radius: 6px !important;
-    }
-
-    @media print{
-      body{ background:white; margin:0; }
-      .sheet{ box-shadow:none; margin:0; padding:8mm; }
-      button, .controls{ display:none; }
-    }
-    
-    @media screen and (max-width: 768px) {
-      .sheet {
-        width: 100% !important;
-        padding: 12px;
-        margin: 0;
-        border-radius: 0;
-      }
-      .row { flex-direction: column; gap: 8px; }
-      .col { min-width: 100% !important; }
-      header h1 { font-size: 16px; }
-      header .meta { font-size: 12px; }
-    }
-
-    @media print {
-      .section { page-break-inside: avoid; }
-    }
-
-    .reportCard { page-break-inside: avoid; margin-bottom: 12px; }
-
-    .pdf-export .reportCard textarea {
-      display: block;
-      width: 100%;
-      min-height: 80px;
-      max-height: 200px;
-      overflow: hidden;
-      border: 1px solid #ccc;
-      padding: 6px;
-      resize: none;
-      box-sizing: border-box;
-      font-family: inherit;
-      font-size: 12px;
-      white-space: pre-wrap;
-    }
-    .reportTextBox {
-      border: 1px solid #ccc;
-      padding: 6px;
-      min-height: 80px;
-      overflow: hidden;
-      box-sizing: border-box;
-      font-family: inherit;
-      font-size: 12px;
-      background: #fafafa;
-      border-radius: 4px;
-      white-space: pre-wrap;
-    }
-    .report-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border-bottom: 2px solid #e0e4ea;
-      padding-bottom: 12px;
-      margin-bottom: 18px;
-    }
-    .report-header .logo { height: 64px; width: auto; }
-    .header-text h1 { margin: 0; color: var(--accent); font-size: 24px; }
-    .header-text .meta { color: var(--muted); font-size: 15px; margin-top: 4px; }
-    .report-header .logo-link { display: inline-block; }
-    .pdf-mode .report-header { border-bottom: 1px solid #ccc; }
-    button.add-button {
-  background: #4CAF50; /* A nice shade of green */
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.12); /* Optional: Adjust shadow color */
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Field Service Report</title>
+<style>
+:root {
+  --accent: #0b68b0;
+  --muted: #666;
+  --paper-width: 210mm;
 }
 
-button.remove-button {
-  background: #f44336; /* A nice shade of red */
-  color: white; /* Make the text white for better contrast */
-  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.12); /* Optional: Adjust shadow color */
-  border: none; /* Remove the border inherited from .secondary */
+body {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 12px;
+  background: #f4f6f8;
+  color: #222;
 }
-  </style>
+
+.sheet {
+  background: white;
+  width: calc(var(--paper-width) - 24px);
+  margin: 10px auto;
+  padding: 18mm;
+  border-radius: 6px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+header h1 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 20px;
+}
+
+header .meta {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.section { margin-top: 16px; padding-top: 12px; }
+.row { display: flex; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.col { flex: 1; min-width: 180px; }
+
+label {
+  display: block;
+  font-size: 12px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+input, textarea, select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #d7dbe1;
+  border-radius: 4px;
+  font-size: 13px;
+  background: #fff;
+}
+
+textarea { min-height: 80px; resize: vertical; }
+
+.table-like {
+  border: 1px solid #e0e4ea;
+  padding: 10px;
+  border-radius: 6px;
+  background: #fbfdff;
+}
+
+.controls { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(11, 104, 176, 0.12);
+}
+
+button.secondary {
+  background: #f3f5f8;
+  color: #222;
+  box-shadow: none;
+  border: 1px solid #e1e5ea;
+}
+
+button.add-button { background: #4caf50; box-shadow: 0 4px 8px rgba(76, 175, 80, 0.12); }
+button.remove-button { background: #f44336; box-shadow: 0 4px 8px rgba(244, 67, 54, 0.12); }
+
+.signature-box {
+  min-height: 64px;
+  border: 1px dashed #cfd6dd;
+  padding: 8px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.rating { display: flex; gap: 6px; align-items: center; }
+.rating input { width: 40px; }
+
+.reportCard { page-break-inside: avoid; margin-bottom: 12px; }
+.reportTextBox {
+  border: 1px solid #ccc;
+  padding: 6px;
+  min-height: 80px;
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 12px;
+  background: #fafafa;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+
+.report-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 2px solid #e0e4ea;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.report-header .logo { height: 64px; width: auto; }
+.header-text h1 { margin: 0; color: var(--accent); font-size: 24px; }
+.header-text .meta { color: var(--muted); font-size: 15px; margin-top: 4px; }
+.report-header .logo-link { display: inline-block; }
+
+/* PDF-mode */
+.pdf-mode .sheet { box-shadow: none; }
+.pdf-export .reportCard textarea { display: block; width: 100%; min-height: 80px; max-height: 200px; overflow: hidden; resize: none; }
+.pdf-export .row { display: flex; flex-wrap: wrap; }
+.pdf-export .col { flex: 1 1 45%; min-width: 45%; margin-bottom: 6px; }
+.pdf-export select { display: block; width: 100%; }
+.pdf-export .table-like { padding: 6px 8px; }
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  .sheet { width: 100% !important; padding: 12px; margin: 0; border-radius: 0; }
+  .row { flex-direction: column; gap: 8px; }
+  .col { min-width: 100% !important; }
+  header h1 { font-size: 16px; }
+  header .meta { font-size: 12px; }
+}
+
+@media print {
+  body { background: white; margin: 0; }
+  .sheet { margin: 0; padding: 8mm; }
+  button, .controls, .pictureDropZone { display: none !important; }
+  .section, .picCard, .antennaCard, .bdeCard { page-break-inside: avoid; }
+  .antennaBlock, .assetPageWrapper { page-break-after: always; break-after: page; }
+  .assetCard:last-child, .antennaBlock:last-child { page-break-after: auto; break-after: auto; }
+}
+</style>
 </head>
 <body>
-  <div class="sheet" id="reportRoot">
-    <header class="report-header">
-      <a href="https://mtnsat.com" target="_blank" class="logo-link">
-        <img src="https://raw.githubusercontent.com/pgarciafer/mtn_fsr/main/mtnsatlogo.png" 
-             alt="MNT Sat Logo" class="logo">
-      </a>
-      <div class="header-text">
-        <h1>Field Service Report</h1>
-        <div class="meta">Field Services Engineering Document</div>
-      </div>
-    </header>
+<div class="sheet" id="reportRoot">
+  <header class="report-header">
+    <a href="https://mtnsat.com" target="_blank" class="logo-link">
+      <img src="https://raw.githubusercontent.com/pgarciafer/mtn_fsr/main/mtnsatlogo.png" alt="MNT Sat Logo" class="logo">
+    </a>
+    <div class="header-text">
+      <h1>Field Service Report</h1>
+      <div class="meta">Field Services Engineering Document</div>
+    </div>
+  </header>
 
-    <!-- Submitted By -->
-    <div class="section table-like">
-      <div class="row">
-        <div class="col"><label>Submitted By</label><input type="text" id="submittedBy" /></div>
-        <div class="col"><label>Position</label><input type="text" id="position" /></div>
-        <div class="col"><label>Date</label><input type="date" id="formDate" /></div>
+  <!-- Submitted By -->
+  <div class="section table-like">
+    <div class="row">
+      <div class="col"><label>Submitted By</label><input type="text" id="submittedBy" /></div>
+      <div class="col"><label>Position</label><input type="text" id="position" /></div>
+      <div class="col"><label>Date</label><input type="date" id="formDate" /></div>
+    </div>
+  </div>
+
+  <!-- Case Details -->
+  <div class="section">
+    <h3>Case Details</h3>
+    <div class="row table-like">
+      <div class="col"><label>Case Number</label><input type="text" id="woNumber" /></div>
+      <div class="col"><label>Description</label><input type="text" id="taskDescription" /></div>
+      <div class="col"><label>Additional Technician Names</label><input type="text" id="techNames" /></div>
+      <div class="col"><label>Customer</label><input type="text" id="customer" /></div>
+      <div class="col"><label>Site Name</label><input type="text" id="siteName" /></div>
+      <div class="row table-like">
+        <div class="col"><label>Arrival Location / Date</label><input type="text" id="arrival" /></div>
+        <div class="col"><label>Departure Location / Date</label><input type="text" id="departure" /></div>
       </div>
     </div>
+  </div>
 
-    <!-- Case Details -->
-    <div class="section">
-      <h3>Case Details</h3>
-      <div class="row table-like">
-        <div class="col"><label>Case Number</label><input type="text" id="woNumber" /></div>
-        <div class="col"><label>Description</label><input type="text" id="taskDescription" /></div>
-        <div class="col"><label>Additional Technician Names</label><input type="text" id="techNames" /></div>
-        <div class="col"><label>Customer</label><input type="text" id="customer" /></div>
-        <div class="col"><label>Site Name</label><input type="text" id="siteName" /></div>
-        <div class="row table-like">
-          <div class="col"><label>Arrival Location / Date</label><input type="text" id="arrival" /></div>
-          <div class="col"><label>Departure Location / Date</label><input type="text" id="departure" /></div>
+  <!-- Assets -->
+  <div class="section">
+    <h3>Assets</h3>
+    <div id="assetsContainer"></div>
+    <div class="row" style="gap:6px; flex-wrap: nowrap; justify-content:flex-start;">
+      <select id="assetSelect" style="width:150px; padding:6px; font-size:13px;">
+        <option value="">-- Select Asset --</option>
+        <option value="VSAT">VSAT</option>
+        <option value="TVRO">TVRO</option>
+        <option value="Starlink">Starlink</option>
+        <option value="5G">5G</option>
+        <option value="Other">Other</option>
+      </select>
+      <button id="confirmAsset" type="button" class="add-button" style="width:150px; padding:6px; font-size:13px;">OK</button>
+      <button id="removeAsset" type="button" class="remove-button secondary" style="width:150px; padding:6px; font-size:13px;">Remove Last</button>
+    </div>
+  </div>
+
+  <!-- Report Entries -->
+  <div class="section">
+    <h3>Report & Additional Details</h3>
+    <div id="reportEntries">
+      <div class="table-like">
+        <div class="row" style="flex-direction:column;">
+          <div class="col"><label>Date</label><input type="date" class="entryDate" /></div>
+          <div class="col"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
         </div>
       </div>
     </div>
+    <div class="controls">
+      <button type="button" id="addEntry">Add Report Entry</button>
+      <button type="button" id="removeEntry" class="secondary">Remove Last Entry</button>
+    </div>
+  </div>
 
-    <!-- Assets -->
-<div class="section">
-  <h3>Assets</h3>
-  <div id="assetsContainer"></div>
-  <div class="controls">
-    <button type="button" id="addAsset" class="add-button">Add Asset</button>
-    <button type="button" id="removeAsset" class="remove-button secondary">Remove Last Asset</button>
+  <!-- Embedded Files -->
+  <div class="section">
+    <h3>Embedded Files / Configs</h3>
+    <div id="embeddedContainer">
+      <div class="embeddedCard row table-like">
+        <div class="col"><label>Description</label><input type="text" class="embDesc" /></div>
+        <div class="col"><label>Files</label><input type="text" class="embFiles" /></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button type="button" id="addEmbedded">Add Embedded File</button>
+      <button type="button" id="removeEmbedded" class="secondary">Remove Embedded File</button>
+    </div>
+  </div>
+
+  <!-- Final Comments & Signatures -->
+  <div class="section">
+    <h3>Final Comments / Recommendations</h3>
+    <textarea id="finalComments"></textarea>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:220px;">
+        <label>Technician Name</label><input type="text" id="techName" />
+        <label>Signature</label><div class="signature-box">[Signature area]</div>
+        <label>Date</label><input type="date" id="techDate" />
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <label>Customer Representative Name & Position</label><input type="text" id="custName" />
+        <label>Signature</label><div class="signature-box">[Signature area]</div>
+        <label>Date</label><input type="date" id="custDate" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Feedback -->
+  <div class="section">
+    <h3>Customer Feedback</h3>
+    <div class="row">
+      <div class="col">
+        <label>Rate our field work (1–10)</label>
+        <div class="rating"><input type="number" min="1" max="10" id="rating" /></div>
+      </div>
+      <div class="col"><label>Comments</label><textarea id="custComments"></textarea></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls" style="margin-top:18px;">
+    <button id="generatePdf">Generate PDF</button>
+    <button id="printBtn" class="secondary">Print (Save PDF)</button>
+    <button id="downloadJson" class="secondary">Download JSON</button>
+    <button id="clearForm" class="secondary">Clear form</button>
   </div>
 </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
+  <!-- --- TVRO & VSAT templates (your full existing module scripts) --- -->
+  
+  
+  <!-- TVRO template section -->
+<script type="module">
+class TVROTemplate extends HTMLElement {
+  constructor() {
+    super();
+    this.innerHTML = `
+      <div>
+        <!-- Antenna Blocks -->
+        <div id="antennaMainContainer"></div>
 
-
-    <!-- Report Entries -->
-    <div class="section">
-      <h3>Report & Additional Details</h3>
-      <div id="reportEntries">
-        <div class="table-like" style="margin-bottom:8px;">
-          <div class="row" style="flex-direction:column;">
-            <div class="col" style="width:100%;"><label>Date</label><input type="date" class="entryDate" /></div>
-            <div class="col" style="width:100%;"><label>Report Detail</label><textarea class="entryDetail"></textarea></div>
+        <!-- Receiver -->
+        <div class="section">
+          <h3>Receiver</h3>
+          <div class="row table-like">
+            <div class="col"><label>Model</label><input type="text" id="recModel" /></div>
+            <div class="col"><label>Description</label><input type="text" id="recDesc" /></div>
+            <div class="col"><label>Serial Numbers</label><input type="text" id="recSN" /></div>
+            <div class="col"><label>Input connection</label><input type="text" id="recInput" /></div>
+            <div class="col"><label>Signal Level / Margin</label><input type="text" id="recSignal" /></div>
+            <div class="col"><label>Satellite</label><input type="text" id="recSatellite" /></div>
           </div>
         </div>
-      </div>
-      <div class="controls">
-        <button type="button" id="addEntry">Add Report Entry</button>
-        <button type="button" id="removeEntry" class="secondary">Remove Last Entry</button>
-      </div>
-    </div>
-
-    <!-- Embedded Files -->
-    <div class="section">
-      <h3>Embedded Files / Configs</h3>
-      <div id="embeddedContainer">
-        <div class="embeddedCard row table-like" style="margin-bottom:10px;">
-          <div class="col"><label>Description</label><input type="text" class="embDesc" /></div>
-          <div class="col"><label>Files</label><input type="text" class="embFiles" /></div>
-        </div>
-      </div>
-      <div class="controls">
-        <button type="button" id="addEmbedded">Add Embedded File</button>
-        <button type="button" id="removeEmbedded" class="secondary">Remove Embedded File</button>
-      </div>
-    </div>
-
-    <!-- Final Comments -->
-    <div class="section">
-      <h3>Final Comments / Recommendations</h3>
-      <textarea id="finalComments"></textarea>
-      <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:220px;">
-          <label>Technician Name</label><input type="text" id="techName" />
-          <label style="margin-top:6px">Signature</label>
-          <div class="signature-box">[Signature area]</div>
-          <label style="margin-top:6px">Date</label><input type="date" id="techDate" />
-        </div>
-        <div style="flex:1; min-width:220px;">
-          <label>Customer Representative Name & Position</label><input type="text" id="custName" />
-          <label style="margin-top:6px">Signature</label>
-          <div class="signature-box">[Signature area]</div>
-          <label style="margin-top:6px">Date</label><input type="date" id="custDate" />
-        </div>
-      </div>
-    </div>
-
-    <!-- Customer Feedback -->
-    <div class="section">
-      <h3>Customer Feedback</h3>
-      <div class="row">
-        <div class="col">
-          <label>Rate our field work (1–10)</label>
-          <div class="rating"><input type="number" min="1" max="10" id="rating" /></div>
-        </div>
-        <div class="col"><label>Comments</label><textarea id="custComments"></textarea></div>
-      </div>
-    </div>
 
         <!-- Controls -->
-    <div class="controls" style="margin-top:18px;">
-      <button id="generatePdf">Generate PDF</button>
-      <button id="printBtn" class="secondary">Print (Save PDF)</button>
-      <button id="downloadJson" class="secondary">Download JSON</button>
-      <button id="clearForm" class="secondary">Clear form</button>
+        <div class="controls">
+          <button type="button" id="addAntenna">Add Antenna</button>
+          <button type="button" id="removeAntenna" class="secondary">Remove Antenna</button>
+        </div>
+      </div>
+    `;
+
+    this._setupBehavior();
+  }
+
+  _createAntennaBlock(index) {
+    const block = document.createElement("div");
+    block.classList.add("antennaBlock");
+    block.innerHTML = `
+      <!-- Antenna -->
+      <div class="antennaCard table-like" style="margin-bottom:10px;">
+        <h4 class="antHeading" style="color:#0b68b0;">TVRO Antenna #${index}</h4>
+        <div class="row">
+          <div class="col"><label>Antenna Model</label><input type="text" class="antModel" /></div>
+          <div class="col"><label>Serial Number</label><input type="text" class="antSerial" /></div>
+          <div class="col"><label>Description</label><input type="text" class="antDesc" /></div>
+          <div class="col"><label>Location</label><input type="text" class="antLocation" /></div>
+          <div class="col"><label>Condition</label><input type="text" class="antCondition" /></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>IFL Type</label><input type="text" class="antIFL" /></div>
+          <div class="col"><label>Feed Type</label><input type="text" class="antFeed" /></div>
+          <div class="col"><label>Filter & LNB Type</label><input type="text" class="antFilter" /></div>
+        </div>
+        <div class="row">
+          <div class="col"><label>IFL Termination details</label><input type="text" class="antIFLTerm" /></div>
+        </div>
+      </div>
+
+      <!-- Below Deck -->
+      <div class="bdeCard table-like" style="margin-bottom:10px;">
+        <h4 class="bdeHeading" style="color:#0b68b0;">BDE TVRO Antenna #${index}</h4>
+        <div class="row">
+          <div class="col"><label>Model</label><input type="text" class="bdeModel" /></div>
+          <div class="col"><label>Serial Number</label><input type="text" class="bdeSN" /></div>
+          <div class="col"><label>Description</label><input type="text" class="bdeDesc" /></div>
+          <div class="col"><label>IP Address</label><input type="text" class="bdeIP" /></div>
+          <div class="col"><label>Rack Location</label><input type="text" class="bdeRack" /></div>
+          <div class="col"><label>IFL Termination details</label><input type="text" class="bdeTerm" /></div>
+          <div class="col"><label>Matrix Type – In use/Bypassed?</label><input type="text" class="bdeMatrix" /></div>
+        </div>
+      </div>
+
+      <!-- Pictures -->
+      <div class="picCard table-like" style="margin-bottom:10px;">
+        <h4 class="picHeading" style="color:#0b68b0;">Pictures TVRO #${index}</h4>
+        <div class="pictureDropZone" style="border:2px dashed #aaa; padding:20px; text-align:center; cursor:pointer;">
+          Drag & Drop or Click to Upload
+          <input type="file" class="picFile" multiple style="display:none;" />
+        </div>
+        <div class="picList"></div>
+      </div>
+    `;
+
+    this._setupPictureUpload(block.querySelector(".picCard"));
+
+    return block;
+  }
+
+  _setupBehavior() {
+    const container = this.querySelector("#antennaMainContainer");
+
+    const addAntenna = () => {
+      const index = container.children.length + 1;
+      const block = this._createAntennaBlock(index);
+      container.appendChild(block);
+    };
+
+    const removeAntenna = () => {
+      if (container.children.length > 0) {
+        container.removeChild(container.lastChild);
+      }
+    };
+
+    this.querySelector("#addAntenna").onclick = addAntenna;
+    this.querySelector("#removeAntenna").onclick = removeAntenna;
+
+    // Add the first antenna by default
+    addAntenna();
+  }
+
+_setupPictureUpload(card) {
+  const dropZone = card.querySelector(".pictureDropZone");
+  const fileInput = dropZone.querySelector(".picFile");
+  const list = card.querySelector(".picList");
+
+  // Adjust drop zone size
+  dropZone.style.height = "80px";
+  dropZone.style.lineHeight = "80px"; // vertical centering text
+  dropZone.style.fontSize = "14px";
+
+  const handleFiles = files => {
+    [...files].forEach(file => {
+      if (!file.type.startsWith("image/")) return;
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          // Always scale image to 25% of printable page width
+          img.style.width = "45%";
+          img.style.height = "auto";
+          img.style.display = "block";
+          img.style.margin = "10px auto"; // center horizontally and add vertical spacing
+
+          list.appendChild(img);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  dropZone.onclick = () => fileInput.click();
+  fileInput.onchange = e => handleFiles(e.target.files);
+
+  dropZone.ondragover = e => {
+    e.preventDefault();
+    dropZone.style.background = "#eef";
+  };
+  dropZone.ondragleave = () => {
+    dropZone.style.background = "";
+  };
+  dropZone.ondrop = e => {
+    e.preventDefault();
+    dropZone.style.background = "";
+    handleFiles(e.dataTransfer.files);
+  };
+}
+
+
+
+  getData() {
+    const antennas = [...this.querySelectorAll(".antennaBlock")].map(block => ({
+      antenna: {
+        model: block.querySelector(".antModel").value,
+        serial: block.querySelector(".antSerial").value,
+        description: block.querySelector(".antDesc").value,
+        location: block.querySelector(".antLocation").value,
+        condition: block.querySelector(".antCondition").value,
+        iflType: block.querySelector(".antIFL").value,
+        feedType: block.querySelector(".antFeed").value,
+        filterLnb: block.querySelector(".antFilter").value,
+        iflTermination: block.querySelector(".antIFLTerm").value,
+      },
+      belowDeck: {
+        model: block.querySelector(".bdeModel").value,
+        serial: block.querySelector(".bdeSN").value,
+        description: block.querySelector(".bdeDesc").value,
+        ip: block.querySelector(".bdeIP").value,
+        rack: block.querySelector(".bdeRack").value,
+        termination: block.querySelector(".bdeTerm").value,
+        matrix: block.querySelector(".bdeMatrix").value,
+      },
+      pictures: [...block.querySelectorAll(".picList img")].map(img => img.src)
+    }));
+
+    const receiver = {
+      model: this.querySelector("#recModel").value,
+      description: this.querySelector("#recDesc").value,
+      serial: this.querySelector("#recSN").value,
+      input: this.querySelector("#recInput").value,
+      signal: this.querySelector("#recSignal").value,
+      satellite: this.querySelector("#recSatellite").value,
+    };
+
+    return { antennas, receiver };
+  }
+}
+
+if (!customElements.get("tvro-template")) {
+  customElements.define("tvro-template", TVROTemplate);
+}
+</script>
+
+<!-- VSAT template section -->
+<script type="module">
+class VSATTemplate extends HTMLElement {
+  constructor() {
+    super();
+    this.innerHTML = `
+      <div>
+        <!-- Antenna / VSAT Blocks -->
+        <div id="vsatMainContainer"></div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button type="button" id="addVSATAntenna">Add VSAT</button>
+          <button type="button" id="removeVSATAntenna" class="secondary">Remove VSAT</button>
+        </div>
+      </div>
+    `;
+    this._setupBehavior();
+  }
+
+  _createVSATBlock(index) {
+  const block = document.createElement("div");
+  block.classList.add("antennaBlock");
+  block.innerHTML = `
+    <!-- VSAT Antenna -->
+    <div class="antennaCard table-like" style="margin-bottom:10px;">
+      <h4 class="antHeading" style="color:#0b68b0;">VSAT #${index}</h4>
+      <div class="row">
+        <div class="col">
+          <select class="antType" style="width:100%; padding:6px; font-size:13px;">
+            <option value="Primary VSAT">Primary VSAT</option>
+            <option value="Secondary VSAT">Secondary VSAT</option>
+          </select>
+        </div>
+        <div class="col"><input type="text" class="antModel" placeholder="Antenna Model" /></div>
+        <div class="col"><input type="text" class="antSerial" placeholder="Serial Number" /></div>
+        <div class="col"><input type="text" class="antIP" placeholder="IP Address" /></div>
+        <div class="col"><input type="text" class="antIFL" placeholder="IFL" /></div>
+        <div class="col"><input type="text" class="antModem" placeholder="Modem Type & SN" /></div>
+        <div class="col"><input type="text" class="antLocation" placeholder="Location" /></div>
+      </div>
+
+      <!-- BUC Section -->
+      <div class="bucContainer section" style="margin-top:8px;">
+        <div class="bucList"></div>
+        <button type="button" class="addBUC add-button">Add BUC</button>
+      </div>
+
+      <!-- Comments -->
+      <div class="section">
+        <textarea class="antComments" placeholder="Comments" style="width:100%;"></textarea>
+      </div>
     </div>
 
-    
-  </div> <!-- now close .sheet here -->
+    <!-- Pictures -->
+    <div class="picCard table-like" style="margin-bottom:10px;">
+      <h4 class="picHeading" style="color:#0b68b0;">Pictures VSAT #${index}</h4>
+      <div class="pictureDropZone" style="border:2px dashed #aaa; padding:20px; text-align:center; cursor:pointer;">
+        Drag & Drop or Click to Upload
+        <input type="file" class="picFile" multiple style="display:none;" />
+      </div>
+      <div class="picList"></div>
+    </div>
+  `;
 
-  <!-- Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    // Setup BUC add/remove
+    const bucContainer = block.querySelector(".bucContainer");
+    const bucList = bucContainer.querySelector(".bucList");
+    const addBUCButton = bucContainer.querySelector(".addBUC");
+
+    addBUCButton.onclick = () => {
+      const bucItem = document.createElement("div");
+      bucItem.className = "row";
+      bucItem.style.marginBottom = "6px";
+      bucItem.innerHTML = `
+        <div class="col"><input type="text" placeholder="BUC Model" class="bucType" /></div>
+        <div class="col"><input type="text" placeholder="BUC SN" class="bucSN" /></div>
+        <button type="button" class="removeBUC secondary">Remove</button>
+      `;
+      bucItem.querySelector(".removeBUC").onclick = () => bucItem.remove();
+      bucList.appendChild(bucItem);
+    };
+
+    // Setup pictures
+    this._setupPictureUpload(block.querySelector(".picCard"));
+
+    return block;
+  }
+
+  _setupBehavior() {
+    const container = this.querySelector("#vsatMainContainer");
+
+    const addVSATAntenna = () => {
+      const index = container.children.length + 1;
+      const block = this._createVSATBlock(index);
+      container.appendChild(block);
+    };
+
+    const removeVSATAntenna = () => {
+      if (container.children.length > 0) container.removeChild(container.lastChild);
+    };
+
+    this.querySelector("#addVSATAntenna").onclick = addVSATAntenna;
+    this.querySelector("#removeVSATAntenna").onclick = removeVSATAntenna;
+
+    // Add first VSAT block by default
+    addVSATAntenna();
+  }
+
+  _setupPictureUpload(card) {
+    const dropZone = card.querySelector(".pictureDropZone");
+    const fileInput = dropZone.querySelector(".picFile");
+    const list = card.querySelector(".picList");
+
+    dropZone.style.height = "80px";
+    dropZone.style.lineHeight = "80px";
+    dropZone.style.fontSize = "14px";
+
+    const handleFiles = files => {
+      [...files].forEach(file => {
+        if (!file.type.startsWith("image/")) return;
+
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            img.style.width = "45%";
+            img.style.height = "auto";
+            img.style.display = "block";
+            img.style.margin = "10px auto";
+            list.appendChild(img);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = e => handleFiles(e.target.files);
+
+    dropZone.ondragover = e => {
+      e.preventDefault();
+      dropZone.style.background = "#eef";
+    };
+    dropZone.ondragleave = () => { dropZone.style.background = ""; };
+    dropZone.ondrop = e => {
+      e.preventDefault();
+      dropZone.style.background = "";
+      handleFiles(e.dataTransfer.files);
+    };
+  }
+
+  getData() {
+    return [...this.querySelectorAll(".antennaBlock")].map(block => {
+      const pics = [...block.querySelectorAll(".picList img")].map(img => img.src);
+      return {
+        assetType: block.querySelector('input[readonly]')?.value || "VSAT",
+        antennaModel: block.querySelector(".antModel")?.value,
+        serial: block.querySelector(".antSerial")?.value,
+        ip: block.querySelector(".antIP")?.value,
+        ifl: block.querySelector(".antIFL")?.value,
+        modem: block.querySelector(".antModem")?.value,
+        location: block.querySelector(".antLocation")?.value,
+        comments: block.querySelector(".antComments")?.value,
+        buc: [...block.querySelectorAll(".bucList .row")].map(b => ({
+          type: b.querySelector(".bucType")?.value,
+          serial: b.querySelector(".bucSN")?.value
+        })),
+        ...(pics.length > 0 && { pictures: pics }) // now pics is defined
+      };
+    });
+	}
+}
+
+
+
+
+
+
+
+
+if (!customElements.get("vsat-template")) {
+  customElements.define("vsat-template", VSATTemplate);
+}
+</script>
+
   <script>
-
-    /* ---------- single assetTemplates object (fixed) ---------- */
+    /* ---------- Existing form helpers and assetTemplates ---------- */
     const assetTemplates = {
-  "VSAT": `
-    <div class="assetCard table-like">
-      <div class="row">
-        <div class="col"><label>Asset Type</label><input type="text" value="VSAT" readonly /></div>
-        <div class="col"><label>Antenna Size</label><input type="text" class="assetDetail" /></div>
-        <div class="col"><label>Modem Model</label><input type="text" /></div>
-      </div>
-    </div>
-  `,
-  "TVRO": `
-    <div class="assetCard table-like">
-      <div class="row">
-        <div class="col"><label>Asset Type</label><input type="text" value="TVRO" readonly /></div>
-      </div>
-      <tvro-template></tvro-template>
-    </div>
-  `,
-  "Starlink": `
-    <div class="assetCard table-like">
-      <div class="row">
-        <div class="col"><label>Asset Type</label><input type="text" value="Starlink" readonly /></div>
-        <div class="col"><label>Kit ID</label><input type="text" /></div>
-        <div class="col"><label>Mount Type</label><input type="text" /></div>
-      </div>
-    </div>
-  `,
-  "5G": `
-    <div class="assetCard table-like">
-      <div class="row">
-        <div class="col"><label>Asset Type</label><input type="text" value="5G" readonly /></div>
-        <div class="col"><label>Router Model</label><input type="text" /></div>
-        <div class="col"><label>SIM ICCID</label><input type="text" /></div>
-      </div>
-    </div>
-  `,
-  "Other": `
-    <div class="assetCard table-like">
-      <div class="row">
-        <div class="col"><label>Asset Type</label><input type="text" value="Other" readonly /></div>
-        <div class="col"><label>Description</label><input type="text" class="assetDetail" /></div>
-      </div>
-    </div>
-  `
-};
+		  "VSAT": `<div class="assetCard table-like"><vsat-template></vsat-template></div>`,
+		  "TVRO": `<div class="assetCard table-like"><tvro-template></tvro-template></div>`,
+		  "Starlink": `
+			<div class="assetCard table-like">
+			  <div class="row">
+				<div class="col">
+				  <label>STARLINK</label>
+				  <select class="assetType" style="width:100%; padding:6px; font-size:13px;">
+					<option value="Starlink">Starlink</option>
+					<option value="Starlink Pro">Starlink Pro</option>
+					<option value="Starlink Maritime">Starlink Maritime</option>
+				  </select>
+				</div>
+				<div class="col"><label>Kit ID</label><input type="text" /></div>
+				<div class="col"><label>Mount Type</label><input type="text" /></div>
+			  </div>
+			</div>
+		  `,
+		  "5G": `
+			<div class="assetCard table-like">
+			  <div class="row">
+				<div class="col">
+				  <label>5G</label>
+				  <select class="assetType" style="width:100%; padding:6px; font-size:13px;">
+					<option value="5G Router">5G Router</option>
+					<option value="5G CPE">5G CPE</option>
+				  </select>
+				</div>
+				<div class="col"><label>Router Model</label><input type="text" /></div>
+				<div class="col"><label>SIM ICCID</label><input type="text" /></div>
+			  </div>
+			</div>
+		  `,
+		  "Other": `
+			<div class="assetCard table-like">
+			  <div class="row">
+				<div class="col">
+				  <label>Asset Type</label>
+				  <input type="text" value="Other" readonly />
+				</div>
+				<div class="col"><label>Description</label><input type="text" class="assetDetail" /></div>
+			  </div>
+			</div>
+		  `
+		};
 
-
-    /* ---------- utility helpers ---------- */
-    function cloneCard(containerId, cardClass){
-      const container = document.getElementById(containerId);
-      const firstCard = container.querySelector(`.${cardClass}`);
-      const clone = firstCard.cloneNode(true);
-      clone.querySelectorAll('input, textarea').forEach(el => el.value = '');
-      container.appendChild(clone);
-    }
-    function removeCard(containerId){
-      const container = document.getElementById(containerId);
-      if(container.children.length > 1) container.removeChild(container.lastElementChild);
-    }
-
-    // Embedded Files
-    document.getElementById('addEmbedded').onclick = ()=>cloneCard('embeddedContainer','embeddedCard');
-    document.getElementById('removeEmbedded').onclick = ()=>removeCard('embeddedContainer');
-
-    // Report Entries
-    document.getElementById('addEntry').onclick = ()=>{
+    /* ---------- Report Entries add/remove ---------- */
+    document.getElementById('addEntry').onclick = () => {
       const container = document.getElementById('reportEntries');
       const block = document.createElement('div');
       block.className = 'table-like';
@@ -340,13 +743,28 @@ button.remove-button {
         </div>`;
       container.appendChild(block);
     };
-    document.getElementById('removeEntry').onclick = ()=>{
+    document.getElementById('removeEntry').onclick = () => {
       const container = document.getElementById('reportEntries');
-      if(container.children.length > 1) container.removeChild(container.lastElementChild);
+      if (container.children.length > 1) container.removeChild(container.lastElementChild);
     };
 
-    // Clear form
-    document.getElementById('clearForm').onclick = ()=>{
+    /* ---------- Embedded Files add/remove ---------- */
+    function cloneCard(containerId, cardClass){
+      const container = document.getElementById(containerId);
+      const firstCard = container.querySelector(`.${cardClass}`);
+      const clone = firstCard.cloneNode(true);
+      clone.querySelectorAll('input, textarea').forEach(el => el.value = '');
+      container.appendChild(clone);
+    }
+    function removeCard(containerId){
+      const container = document.getElementById(containerId);
+      if(container.children.length > 1) container.removeChild(container.lastElementChild);
+    }
+    document.getElementById('addEmbedded').onclick = ()=>cloneCard('embeddedContainer','embeddedCard');
+    document.getElementById('removeEmbedded').onclick = ()=>removeCard('embeddedContainer');
+
+    /* ---------- Clear Form ---------- */
+    document.getElementById('clearForm').onclick = () => {
       if(!confirm('Clear all fields?')) return;
       document.querySelectorAll('#reportRoot input, #reportRoot textarea').forEach(el => el.value = '');
       document.getElementById('embeddedContainer').innerHTML = document.querySelector('.embeddedCard').outerHTML;
@@ -359,68 +777,8 @@ button.remove-button {
         </div>`;
     };
 
-    function gatherFormData() {
-      function get(id) {
-        return document.getElementById(id)?.value || "";
-      }
-
-      // (your existing reportEntries code — left unchanged)
-      const entries = Array.from(document.querySelectorAll('#reportEntries .reportEntry')).map(entry => ({
-        date: entry.querySelector('.reportDate').value,
-        location: entry.querySelector('.reportLocation').value,
-        description: entry.querySelector('.reportDescription').value
-      }));
-
-      const embedded = Array.from(document.querySelectorAll('#imagePreview img')).map(img => img.src);
-
-      // Assets: detect TVRO and call its getData()
-      const assets = Array.from(document.querySelectorAll('#assetsContainer .assetCard')).map(card => {
-        const readonlyInput = card.querySelector('input[readonly]');
-        const type = readonlyInput ? readonlyInput.value : (card.querySelector('.assetDetail') ? 'Other' : 'Unknown');
-
-        if (type === "TVRO") {
-          const tvro = card.querySelector("tvro-template");
-          return { type, details: tvro && typeof tvro.getData === 'function' ? tvro.getData() : null };
-        }
-
-        return {
-          type,
-          detail: card.querySelector('.assetDetail')?.value || ""
-        };
-      });
-
-      return {
-        submittedBy: get('submittedBy'),
-        position: get('position'),
-        formDate: get('formDate'),
-        dispatch: {
-          woNumber: get('woNumber'),
-          taskDescription: get('taskDescription'),
-          customer: get('customer'),
-          techNames: get('techNames'),
-          siteName: get('siteName'),
-          arrival: get('arrival'),
-          departure: get('departure')
-        },
-        assets,
-        reportEntries: entries,
-        embedded,
-        finalComments: get('finalComments'),
-        signatures: {
-          techName: get('techName'),
-          techDate: get('techDate'),
-          custName: get('custName'),
-          custDate: get('custDate')
-        },
-        feedback: {
-          rating: get('rating'),
-          comments: get('custComments')
-        }
-      };
-    }
-
-    // JSON export
-    document.getElementById('downloadJson').onclick = ()=>{
+    /* ---------- JSON Export ---------- */
+    document.getElementById('downloadJson').onclick = () => {
       const data = gatherFormData();
       const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob);
@@ -428,98 +786,90 @@ button.remove-button {
       URL.revokeObjectURL(url);
     };
 
-    // PDF
+    /* ---------- PDF Export (Merged logic) ---------- */
     document.getElementById('generatePdf').onclick = () => {
       const now = new Date();
       const fname = `FieldServiceReport_${now.toISOString().split('T')[0]}.pdf`;
       const element = document.getElementById('reportRoot');
       document.body.classList.add("pdf-mode");
 
-      document.querySelectorAll('#reportEntries .table-like textarea').forEach(textarea => {
-        const div = document.createElement('div');
-        div.className = 'reportTextBox';
-        div.textContent = textarea.value;
-        div.style.minHeight = textarea.scrollHeight + "px";
-        textarea.style.display = 'none';
-        textarea.parentNode.insertBefore(div, textarea);
-      });
+      // Convert reportEntries textareas to divs
+      document.querySelectorAll('.assetCard input, .assetCard select, .assetCard textarea').forEach(el => {
+    const div = document.createElement('div');
+    div.className = 'reportTextBox';
+    if (el.tagName === 'SELECT') {
+        div.textContent = el.options[el.selectedIndex]?.text || '';
+    } else {
+        div.textContent = el.value;
+    }
+    div.style.minHeight = el.scrollHeight + 'px';
+    el.style.display = 'none';
+    el.parentNode.insertBefore(div, el);
+});
+
+
       element.classList.add("pdf-export");
+
+      // Remove empty picture sections from TVRO and VSAT assets
+      document.querySelectorAll(".antennaBlock").forEach(block => {
+        const picCards = block.querySelectorAll(".picCard");
+        picCards.forEach(picCard => {
+          const pics = picCard.querySelectorAll(".picList img");
+          if (!pics.length) picCard.remove();
+        });
+      });
 
       html2pdf().set({
         margin:[8,8,8,8],
-        filename:fname,
+        filename: fname,
         image:{ type:'jpeg', quality:0.98 },
         html2canvas:{ scale:2, useCORS:true, logging:false },
         jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' }
       }).from(element).toPdf().get('pdf').then(pdf => {
-        pdf.link(20, 20, 40, 15, { url: "https://mtnsat.com" });
+        pdf.link(20,20,40,15,{url:"https://mtnsat.com"});
       }).save().then(()=>{
-        document.querySelectorAll('#reportEntries .reportTextBox').forEach(div => div.remove());
-        document.querySelectorAll('#reportEntries textarea').forEach(textarea => textarea.style.display = '');
+        document.querySelectorAll('#reportEntries .reportTextBox').forEach(div=>div.remove());
+        document.querySelectorAll('#reportEntries textarea').forEach(textarea=>textarea.style.display='');
         element.classList.remove("pdf-export");
         document.body.classList.remove("pdf-mode");
       });
     };
 
-    // Assets - addAsset action (creates temporary select and inserts the chosen template)
-    document.getElementById('addAsset').onclick = () => {
-      const validAssets = ["VSAT", "TVRO", "Starlink", "5G", "Other"];
-      const container = document.getElementById('assetsContainer');
-      const controls = document.querySelector('.controls');
-
-      // Create a temporary dropdown element
-      const tempSelectDiv = document.createElement('div');
-      tempSelectDiv.className = 'temp-select-container';
-      tempSelectDiv.style.margin = '8px 0';
-      tempSelectDiv.innerHTML = `
-          <label style="display:block; margin-bottom:6px;">Select Asset Type:</label>
-          <select id="assetSelect" style="padding: 8px; border: 1px solid #d7dbe1; border-radius: 4px; font-size: 13px;">
-              <option value="">-- Please Choose --</option>
-              ${validAssets.map(asset => `<option value="${asset}">${asset}</option>`).join('')}
-          </select>
-          <button id="confirmAsset" type="button" class="add-button" style="margin-left: 8px;">OK</button>
-          <button id="cancelAsset" type="button" class="secondary" style="margin-left: 8px;">Cancel</button>
-      `;
-
-      // Insert the dropdown before the asset controls
-      controls.parentNode.insertBefore(tempSelectDiv, controls);
-
-      const assetSelect = document.getElementById('assetSelect');
-      const confirmButton = document.getElementById('confirmAsset');
-      const cancelButton = document.getElementById('cancelAsset');
-
-      confirmButton.onclick = () => {
-          const assetType = assetSelect.value;
-          if (!assetType) {
-              alert("Please select an asset type.");
-              return;
-          }
-          
-          // Remove the temporary dropdown
-          tempSelectDiv.remove();
-
-          // Create the new asset card using template
-          const block = document.createElement('div');
-          block.className = 'assetCard table-like';
-          block.style.marginBottom = '8px';
-          block.innerHTML = assetTemplates[assetType] || `<div>Unknown asset: ${assetType}</div>`;
-          container.appendChild(block);
-      };
-
-      cancelButton.onclick = () => {
-          tempSelectDiv.remove();
-      };
-    };
-
-    document.getElementById('removeAsset').onclick = () => {
-      const container = document.getElementById('assetsContainer');
-      if (container.children.length > 0) container.removeChild(container.lastElementChild);
-    };
-
-    // Print
+    /* ---------- Print ---------- */
     document.getElementById('printBtn').onclick = ()=>window.print();
-  </script>
-<script type="module" src="tvro.js"></script>
 
+    /* ---------- Assets add/remove ---------- */
+    const container = document.getElementById('assetsContainer');
+	const assetSelect = document.getElementById('assetSelect');
+	const confirmAssetBtn = document.getElementById('confirmAsset');
+	
+	const removeAssetBtn = document.getElementById('removeAsset');
+
+	confirmAssetBtn.onclick = () => {
+	  const assetType = assetSelect.value;
+	  if (!assetType) {
+		alert("Please select an asset type.");
+		return;
+	  }
+
+	  const pageWrapper = document.createElement('div');
+	  pageWrapper.className = 'assetPageWrapper';
+	  pageWrapper.style.pageBreakBefore = 'always';
+	  pageWrapper.innerHTML = assetTemplates[assetType] || `<div>Unknown asset: ${assetType}</div>`;
+	  container.appendChild(pageWrapper);
+
+	  // Reset dropdown after adding
+	  assetSelect.value = "";
+	};
+
+	
+
+	removeAssetBtn.onclick = () => {
+	  if (container.lastElementChild) container.removeChild(container.lastElementChild);
+	};
+
+	
+
+  </script>
 </body>
 </html>
